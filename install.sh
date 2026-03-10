@@ -12,6 +12,11 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 SCRIPT_NAME="$(basename "$0")"
 VERSION="1.0.0"
 
+# Proxy settings (required for network access behind firewall)
+export ALL_PROXY="${ALL_PROXY:-http://127.0.0.1:7897}"
+export HTTP_PROXY="${HTTP_PROXY:-http://127.0.0.1:7897}"
+export HTTPS_PROXY="${HTTPS_PROXY:-http://127.0.0.1:7897}"
+
 # Default settings
 DRY_RUN="${DRY_RUN:-false}"
 VERBOSE="${VERBOSE:-false}"

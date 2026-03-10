@@ -16,6 +16,9 @@ run_module() {
     # Install Oh-My-Zsh
     install_oh_my_zsh
 
+    # Deploy standard zshrc template
+    deploy_zshrc_template
+
     log_success "Oh-My-Zsh ready"
 }
 
@@ -78,6 +81,37 @@ install_oh_my_zsh() {
     RUNZSH=no KEEP_ZSHRC=yes sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
 
     log_success "Oh-My-Zsh installed"
+}
+
+deploy_zshrc_template() {
+    log_substep "Deploying standard zshrc template"
+
+    local template="$SCRIPT_DIR/configs/zshrc.template"
+    local zshrc="$HOME/.zshrc"
+
+    if [[ ! -f "$template" ]]; then
+        log_warn "zshrc.template not found at $template, skipping"
+        return 0
+    fi
+
+    # Check if already deployed (compare content)
+    if [[ -f "$zshrc" ]] && diff -q "$template" "$zshrc" &>/dev/null; then
+        log_success "zshrc template already deployed"
+        return 0
+    fi
+
+    if is_dry_run; then
+        log_info "[DRY-RUN] Would deploy zshrc template to $zshrc"
+        return 0
+    fi
+
+    # Backup existing .zshrc before overwriting
+    if [[ -f "$zshrc" ]]; then
+        backup_file "$zshrc" "before deploying zshrc template"
+    fi
+
+    cp "$template" "$zshrc"
+    log_success "zshrc template deployed"
 }
 
 update_oh_my_zsh() {
